@@ -1,4 +1,12 @@
 """
+title: n8n Pipe Function+
+author: cpwan
+version: 0.2.0+
+description:
+    Added async n8n workflow call for proper event emitter
+    Added emit_citations function to render intermediate steps
+"""
+"""
 title: n8n Pipe Function
 author: Cole Medin
 author_url: https://www.youtube.com/@ColeMedin
