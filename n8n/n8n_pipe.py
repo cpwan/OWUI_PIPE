@@ -40,6 +40,31 @@ class Pipe:
         self.valves = self.Valves()
         self.last_emit_time = 0
 
+    async def emit_citations(
+        self,
+        intermediateSteps: list,
+        __event_emitter__: Callable[[dict], Awaitable[None]] = None,
+    ):
+        print(intermediateSteps)
+        for step in intermediateSteps:
+            content = step["observation"]
+            action = step["action"]
+            tool = action["tool"]
+            tool_input = action["toolInput"]
+            print(content)
+            print(action)
+            await __event_emitter__(
+                {
+                    "type": "citation",
+                    "data": {
+                        "document": [content],
+                        "source": {
+                            "name": f"{tool}:{tool_input}",
+                        },
+                    },
+                }
+            )
+
     async def pipe(
         self,
         body: dict,
@@ -72,19 +97,27 @@ class Pipe:
                 payload = {"sessionId": f"{chat_id}"}
                 payload[self.valves.input_field] = question
 
-                n8n_response = ""
+                n8n_response = {}
                 async with aiohttp.ClientSession() as session:
                     async with session.post(
                         self.valves.n8n_url, json=payload, headers=headers
                     ) as response:
                         if response.status == 200:
                             n8n_response = await response.json()
-                            n8n_response = n8n_response[self.valves.response_field]
+                            answer = n8n_response[self.valves.response_field]
+
                         else:
                             raise Exception(
                                 f"Error: {response.status} - {await response.text()}"
                             )
-
+                print(n8n_response)
+                print(n8n_response.get("intermediateSteps", {}))
+                try:
+                    await self.emit_citations(
+                        n8n_response.get("intermediateSteps", {}), __event_emitter__
+                    )
+                except Exception as e:
+                    print("Error: ", e)
             except Exception as e:
                 await __event_emitter__(
                     {
@@ -123,4 +156,4 @@ class Pipe:
                 },
             }
         )
-        yield n8n_response
+        yield answer
