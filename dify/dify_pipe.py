@@ -235,8 +235,8 @@ class Pipe:
             title = source["document_name"]
             dataset_id = source["dataset_id"]
             document_id = source["document_id"]
-            score = source.get("score","NA")
-            url = source.get("doc_metadata",{}).get("url","")
+            score = source.get("score", "NA")
+            url = source.get("doc_metadata", {}).get("url", "")
             await __event_emitter__(
                 {
                     "type": "citation",
