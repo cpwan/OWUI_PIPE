@@ -6,7 +6,7 @@ This repo contains pipe for OpenWebUI integration.
 
 ## Dify Agent
 
-### Dify Document Metadata
+### Setups
 1. Set up the appropriate agent in Dify.
 
     <img src="static/dify-agent-config.png" alt="Dify agent config" width="400">
@@ -15,7 +15,7 @@ This repo contains pipe for OpenWebUI integration.
 
     <img src="static/dify-config.png" alt="Dify config" width="400">
 
-3. Import the function [`code`](dify_integration.py) into OpenWebUI.
+3. Import the function [`code`](dify_pipe.py) into OpenWebUI.
 
     <img src="static/owui-config.png" alt="OpenWebUI config" width="400">
 
