@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.2.0
+    container_name: keycloak
+    ports:
+      - "8080:8080"
+    environment:
+      - KC_BOOTSTRAP_ADMIN_USERNAME=admin
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
+    command: start-dev --hostname=https://laughing-guide-qv775499vxg266v4-80.app.github.dev/auth
+    restart: always
+    networks:
+      - shared_network
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:0.6.5
+    container_name: open-webui
+    ports:
+      - "3000:8080"
+    volumes:
+      - ./open-webui_data:/app/backend/data
+    restart: always
+    networks:
+      - shared_network
+    environment:
+     - ENABLE_OLLAMA_API=False
+     - ENABLE_OAUTH_SIGNUP=True
+     - OAUTH_CLIENT_ID=open-webui
+     - OAUTH_CLIENT_SECRET=6n0tZjOo8IeqpdvoCgakXo2E7DEOPnWS
+     - OPENID_PROVIDER_URL=http://nginx/auth/realms/owui/.well-known/openid-configuration
+     - OAUTH_PROVIDER_NAME=Keycloak
+     - WEBUI_URL=https://laughing-guide-qv775499vxg266v4-80.app.github.dev/
+     - LOG_LEVEL=DEBUG
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - keycloak
+      - open-webui
+    networks:
+      - shared_network
+networks:
+  shared_network:
